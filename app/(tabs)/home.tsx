@@ -2,22 +2,31 @@ import { View, Text, ScrollView, Alert } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import FormField from '@/components/FormField'
 import CustomButton from '@/components/CustomButton'
-import { addWorkSchedule, addAttendance, getCurrentUser, getWorkSchedule } from '../../lib/appwrite'
+import { addWorkSchedule, getWorkSchedule } from '../../lib/appwrite'
 import { useGlobalContext } from '@/context/GlobalProvider'
 
+type Schedule = {
+    sunday: string;
+    monday: string;
+    tuesday: string;
+    wednesday: string;
+    thursday: string;
+    friday: string;
+    saturday: string;
+}
 
-const initialSchedule = {
+const initialSchedule: Schedule = {
+    sunday: '',
     monday: '',
     tuesday: '',
     wednesday: '',
     thursday: '',
     friday: '',
     saturday: '',
-    sunday: ''
 }
 
 const home = () => {
-    const [schedule, setSchedule] = useState(initialSchedule)
+    const [schedule, setSchedule] = useState<Schedule>(initialSchedule)
     const { user } = useGlobalContext()
     const [submitting, setSubmitting] = useState(true);
 
@@ -28,14 +37,15 @@ const home = () => {
                     const userSchedule = await getWorkSchedule(user.username);
                     if (userSchedule) {
                         setSchedule({
+                            sunday: userSchedule.sunday,
                             monday: userSchedule.monday,
                             tuesday: userSchedule.tuesday,
                             wednesday: userSchedule.wednesday,
                             thursday: userSchedule.thursday,
                             friday: userSchedule.friday,
-                            saturday: userSchedule.saturday,
-                            sunday: userSchedule.sunday
+                            saturday: userSchedule.saturday
                         })
+
                     } else {
                         setSubmitting(false)
                         return;
@@ -154,6 +164,14 @@ const home = () => {
                     title='submit'
                     handlePress={submit}
                     containerStyles='bg-emerald-500 w-16 ml-2 p-2'
+                    textStyles='text-white'
+                    isLoading={submitting}
+                />
+
+                <CustomButton
+                    title='edit'
+                    handlePress={() => ('')}
+                    containerStyles='bg-emerald-500 w-16 ml-2 p-2 mt-2r'
                     textStyles='text-white'
                     isLoading={submitting}
                 />

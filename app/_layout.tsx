@@ -6,6 +6,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import GlobalProvider from "../context/GlobalProvider";
 
+
 SplashScreen.preventAutoHideAsync();
 const RootLayout = () => {
     NativeWindStyleSheet.setOutput({

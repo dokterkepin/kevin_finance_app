@@ -6,17 +6,16 @@ export const config = {
     databaseId: '66fa4ddf001b9f89402f',
     userCollectionId: '66fa4e4a00324e9f9e7b',
     scheduleCollectionId: '66ff73d2003c9acac8d9',
-    attendanceCollectionId: '66eaec210018018538d2',
+    attendanceCollectionId: '67027750002aa45df3d0',
     storageId: '66e22cd40011d8cdf4b1'
 }
 
-// Init your React Native SDK
 const client = new Client();
 
 client
-    .setEndpoint(config.endpoint) // Your Appwrite Endpoint
-    .setProject(config.projectId) // Your proj ect ID
-    .setPlatform(config.platform) // Your application ID or bundle ID.
+    .setEndpoint(config.endpoint)
+    .setProject(config.projectId)
+    .setPlatform(config.platform)
 
 const account = new Account(client);
 const databases = new Databases(client)
@@ -114,7 +113,6 @@ export const getWorkSchedule = async (username: string) => {
         console.log(error)
         throw new Error(error as string);
     }
-
 }
 
 // add a new work schedule 
@@ -148,23 +146,52 @@ export const addWorkSchedule = async ({ username, schedule }: {
 }
 
 
-// check user Attandance
-export const addAttendance = async ({ userId, status, earnings, hoursWorked }: {
-    userId: string,
-    status: string,
-    earnings: number,
-    hoursWorked: number
-}) => {
+// Attendance Record
+export const updateAttendanceRecord = async (username: string, newHour: number, newIncome: number, todayDay: string, message: string) => {
     try {
-        const newAttendance = await databases.createDocument(
+        const existingRecord = await databases.listDocuments(
             config.databaseId,
-            config.scheduleCollectionId,
-            ID.unique(),
-            {
-                userId, status, earnings, hoursWorked
-            }
+            config.attendanceCollectionId,
+            [Query.equal('username', username)]
         )
-        return newAttendance
+
+        if (existingRecord.total > 0) {
+            const attendanceDocument = existingRecord.documents[0];
+            const documentId = attendanceDocument.$id
+
+            const updateTotalHours = attendanceDocument.totalHour + newHour
+            const updateTotalIncome = attendanceDocument.totalIncome + newIncome
+
+            const updatedAttendance = await databases.updateDocument(
+                config.databaseId,
+                config.attendanceCollectionId,
+                documentId,
+                {
+                    totalHour: updateTotalHours,
+                    totalIncome: updateTotalIncome,
+                    [todayDay]: message
+
+                }
+            );
+            return updatedAttendance;
+        } else {
+            const attendanceDocument = existingRecord.documents[0];
+            const updateTotalHours = attendanceDocument.totalHour + newHour
+            const updateTotalIncome = attendanceDocument.totalIncome + newIncome
+
+            const newAttendance = await databases.createDocument(
+                config.databaseId,
+                config.attendanceCollectionId,
+                ID.unique(),
+                {
+                    username,
+                    totalHour: updateTotalHours,
+                    totalIncome: updateTotalIncome,
+                    [todayDay]: message
+                }
+            )
+            return newAttendance
+        }
     } catch (error) {
         console.log(error);
         throw new Error(error as string)
@@ -172,5 +199,21 @@ export const addAttendance = async ({ userId, status, earnings, hoursWorked }: {
 }
 
 
+// Get Attendance Record
+export const getAttendanceRecord = async (username: string) => {
+    try {
+        const response = await databases.listDocuments(
+            config.databaseId,
+            config.attendanceCollectionId,
+            [Query.equal('username', username)]
+        )
 
+        if (response) {
+            return response.documents[0]
+        }
 
+    } catch (error) {
+        console.log(error)
+        throw new Error(error as string)
+    }
+}

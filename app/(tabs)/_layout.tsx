@@ -27,6 +27,22 @@ const TabsLayout = () => {
                         headerShown: false
                     }}
                 />
+
+                <Tabs.Screen
+                    name='advice'
+                    options={{
+                        title: 'Advice',
+                        headerShown: false
+                    }}
+                />
+
+                <Tabs.Screen
+                    name='security'
+                    options={{
+                        title: 'Security',
+                        headerShown: false
+                    }}
+                />
             </Tabs>
         </>
     )

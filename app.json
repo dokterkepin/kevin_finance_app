@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "absence_kevin",
-    "slug": "absence_kevin",
+    "slug": "kevinfinanceapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -35,6 +35,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e8d0a4b2-ca3a-463f-b127-305ac383c1dd"
+      }
+    },
+    "owner": "kevinchang"
   }
 }
